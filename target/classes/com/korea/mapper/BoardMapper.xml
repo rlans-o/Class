@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.korea.mapper.BoardMapper">
+
+	<select id="getReply" resultType="com.korea.vo.ReplyVO">
+		select rno
+				,bno
+				,reply
+				,replyer
+				,replydate
+				,updatedate
+			from t_brd_reply
+		where bno =#{bno}
+	</select>
+
+	<select id="getList" resultType="com.korea.vo.BoardVO">
+		select bno
+		,title
+		,content
+		,writer
+		,regdate
+		,date_format(regdate, '%Y-%m-%d') as regdate2
+		,updateDate
+		from t_brd
+		where 1=1
+		<if test="gubun != null and gubun != ''">
+
+			<choose>
+				<when test='"1".equals(gubun)'> <!-- 제목 -->
+
+					<if test="keyword != null and keyword != ''">
+						and title like concat('%', #{keyword}, '%')
+					</if>
+
+				</when>
+				<when test='"2".equals(gubun)'> <!-- 내용 -->
+
+					<if test="keyword != null and keyword != ''">
+						and content like concat('%', #{keyword}, '%')
+					</if>
+
+				</when>
+				<when test='"3".equals(gubun)'> <!-- 제목+내용 -->
+
+					<if test="keyword != null and keyword != ''">
+						and (title like concat('%', #{keyword}, '%') or content like
+						concat('%', #{keyword}, '%'))
+					</if>
+
+				</when>
+				<otherwise>
+
+				</otherwise>
+			</choose>
+
+
+		</if>
+
+
+		<if test="title != null and title != ''">
+			and title like concat('%', #{title}, '%')
+		</if>
+	</select>
+
+	<select id="read" resultType="com.korea.vo.BoardVO">
+		select bno
+		,title
+		,content
+		,writer
+		,regdate
+		,date_format(regdate, '%Y-%m-%d') as regdate2
+		,updateDate
+		from t_brd
+		where bno=#{bno}
+	</select>
+
+	<update id="modify">
+		update t_brd
+		set title =#{title}
+		,content =#{content}
+		<if test="writer != null and writer!='' ">
+			,writer =#{writer}
+		</if>
+		,updateDate =now()
+		where bno =#{bno}
+	</update>
+
+	<delete id="remove">
+		delete from t_brd
+		where bno =#{bno}
+	</delete>
+
+	<insert id="register">
+		insert into t_brd (title ,content ,writer ,regdate
+		,updateDate)
+		values (#{title}, #{content}, #{writer}, now(), now())
+	</insert>
+	
+	
+
+
+</mapper>
